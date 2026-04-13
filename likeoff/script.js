@@ -13,6 +13,7 @@
   const btnBackToMenu = $("btnBackToMenu");
   const btnWinPlayAgain = $("btnWinPlayAgain");
   const btnWinBackToMenu = $("btnWinBackToMenu");
+  const navLogoHome = $("navLogoHome");
 
   const cardLeft = $("cardLeft");
   const cardRight = $("cardRight");
@@ -24,6 +25,7 @@
 
   const finalStreakText = $("finalStreakText");
   const winText = $("winText");
+  const streakValue = $("streakValue");
 
   const POSTS = Array.isArray(window.POSTS) ? window.POSTS : [];
 
@@ -41,8 +43,23 @@
     active.classList.add("screen--active");
   }
 
+  function goHome() {
+    if (revealTimer) {
+      clearTimeout(revealTimer);
+      revealTimer = null;
+    }
+    acceptingInput = false;
+    setActiveScreen(screenStart);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function setStreakDisplay() {
+    if (streakValue) streakValue.textContent = String(streak);
+  }
+
   function resetRoundUI() {
     hint.textContent = "Which post got more likes?";
+    setStreakDisplay();
     clearBadges(cardLeft);
     clearBadges(cardRight);
     cardLeft.classList.remove("card--good", "card--bad");
@@ -99,6 +116,7 @@
     }
 
     streak = 0;
+    setStreakDisplay();
     remainingIndices = POSTS.map((_, i) => i);
     currentPair = null;
     acceptingInput = false;
@@ -106,10 +124,12 @@
     if (POSTS.length < 2) {
       winText.textContent = "Add at least 2 posts to play.";
       setActiveScreen(screenWin);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
     setActiveScreen(screenGame);
+    window.scrollTo({ top: 0, behavior: "smooth" });
     nextRound();
   }
 
@@ -120,6 +140,7 @@
       // No more posts to show: win
       winText.textContent = `You exhausted all posts with a streak of ${streak}.`;
       setActiveScreen(screenWin);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
@@ -157,6 +178,7 @@
     if (chosenCorrect) {
       hint.textContent = "Correct. Next round…";
       streak += 1;
+      setStreakDisplay();
       revealTimer = setTimeout(() => {
         revealTimer = null;
         nextRound();
@@ -167,6 +189,7 @@
         revealTimer = null;
         finalStreakText.textContent = `Your streak: ${streak}`;
         setActiveScreen(screenGameOver);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }, 1100);
     }
   }
@@ -174,9 +197,11 @@
   // Events
   btnStart.addEventListener("click", startNewGame);
   btnPlayAgain.addEventListener("click", startNewGame);
-  btnBackToMenu.addEventListener("click", () => setActiveScreen(screenStart));
+  btnBackToMenu.addEventListener("click", goHome);
   btnWinPlayAgain.addEventListener("click", startNewGame);
-  btnWinBackToMenu.addEventListener("click", () => setActiveScreen(screenStart));
+  btnWinBackToMenu.addEventListener("click", goHome);
+
+  if (navLogoHome) navLogoHome.addEventListener("click", goHome);
 
   cardLeft.addEventListener("click", () => {
     if (!acceptingInput) return;
