@@ -10,7 +10,7 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; overscroll-behavior-y: none; }
 /*
  Overscroll chrome: white band at top (nav) + feed grey below (incl. past bottom).
   Fixed attachment keeps the split viewport-locked so rubber-band feels consistent.

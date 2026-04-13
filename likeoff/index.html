@@ -230,19 +230,5 @@
         });
       }
     </script>
-    <script>
-      (function () {
-        function syncOverscroll() {
-          var y = window.scrollY || document.documentElement.scrollTop;
-          var atTop = y <= 0;
-          var v = atTop ? "none" : "auto";
-          document.documentElement.style.overscrollBehaviorY = v;
-          document.body.style.overscrollBehaviorY = v;
-        }
-        syncOverscroll();
-        window.addEventListener("scroll", syncOverscroll, { passive: true });
-        window.addEventListener("resize", syncOverscroll);
-      })();
-    </script>
   </body>
 </html>
