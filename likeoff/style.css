@@ -352,11 +352,7 @@ h1 span { color: var(--linkedin-blue); }
   font-size: 13px;
 }
 
-/* Bottom snap target: thin sentinel only (not the whole leaderboard) so scroll doesn’t pause then jump back. */
 .scroll-snap-end {
-  scroll-snap-align: end;
-  scroll-snap-stop: normal;
-  scroll-margin-bottom: var(--page-bottom-pad);
   height: 1px;
   width: 100%;
   margin: 0;
@@ -419,11 +415,11 @@ h1 span { color: var(--linkedin-blue); }
 .board li em { font-style: normal; font-weight: 700; color: #1f1f1f; }
 
 #screenStart {
-  padding-bottom: 24px;
+  padding-bottom: 12px;
 }
 
 #screenStart .board {
-  margin-bottom: 64px;
+  margin-bottom: 32px;
 }
 
 /* View switching: landing vs game */
