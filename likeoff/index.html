@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LikeOff</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="site">
+      <header class="nav">
+        <div class="container nav__inner">
+          <div class="logo">Like<span>Off</span></div>
+        </div>
+      </header>
+
+      <section class="hero container">
+        <h1>Which post went<br /><span>more viral?</span></h1>
+        <p>
+          Everyone doomscrolls LinkedIn. But who's actually good at it? Test your
+          doomscrolling skills, two real posts, one question, guess which one went more
+          viral.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--solid" href="#">Play now</a>
+          <a class="btn btn--outline" href="#">View leaderboard</a>
+        </div>
+      </section>
+
+      <section class="container preview">
+        <div class="panel">
+          <div class="panel__label">Live game preview</div>
+          <div class="panel__streak">7</div>
+          <div class="panel__sub">current streak</div>
+          <div class="duel">
+            <article class="duel__card">
+              <div class="duel__head">
+                <div class="avatar">JM</div>
+                <div><strong>Jake Morrison</strong><small>Founder at ECDI</small></div>
+              </div>
+              <p>
+                I got rejected by 47 companies. Then I built one worth $40M. Rejection is
+                just redirection.
+              </p>
+              <span>??? likes</span>
+            </article>
+            <div class="duel__vs">VS</div>
+            <article class="duel__card">
+              <div class="duel__head">
+                <div class="avatar avatar--green">SR</div>
+                <div><strong>Sarah Reynolds</strong><small>Head of People</small></div>
+              </div>
+              <p>
+                Unpopular opinion: work-life balance is a myth. People who change the world
+                are obsessed.
+              </p>
+              <span>??? likes</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="container stats">
+        <div class="stat"><strong>2.4M</strong><small>posts judged</small></div>
+        <div class="stat"><strong>847</strong><small>all-time high streak</small></div>
+        <div class="stat"><strong>150</strong><small>real LinkedIn posts</small></div>
+      </section>
+
+      <section class="container board">
+        <div class="board__head">
+          <button class="board__tab board__tab--active" id="tabAllTime" type="button">
+            All-time leaderboard
+          </button>
+          <button class="board__tab" id="tabToday" type="button">Today's leaderboard</button>
+        </div>
+        <ul id="leaderboardList">
+          <li><span>1</span><b>alex_builds</b><em>34</em></li>
+          <li><span>2</span><b>notalinkedinuser</b><em>28</em></li>
+          <li><span>3</span><b>sara_k</b><em>21</em></li>
+          <li><span>4</span><b>miketech99</b><em>19</em></li>
+          <li><span>5</span><b>jess_m</b><em>14</em></li>
+        </ul>
+      </section>
+
+      <footer class="container foot">
+        <div class="logo">Like<span>Off</span></div>
+      </footer>
+    </main>
+    <script>
+      const allTimeData = [
+        { name: "alex_builds", score: 34 },
+        { name: "notalinkedinuser", score: 28 },
+        { name: "sara_k", score: 21 },
+        { name: "miketech99", score: 19 },
+        { name: "jess_m", score: 14 },
+      ];
+
+      const todayData = [
+        { name: "milo_dev", score: 18 },
+        { name: "tammyk", score: 15 },
+        { name: "productbro", score: 13 },
+        { name: "jamie_x", score: 11 },
+        { name: "rory.codes", score: 9 },
+      ];
+
+      const tabAllTime = document.getElementById("tabAllTime");
+      const tabToday = document.getElementById("tabToday");
+      const leaderboardList = document.getElementById("leaderboardList");
+
+      function renderLeaderboard(data) {
+        leaderboardList.innerHTML = data
+          .map(
+            (entry, idx) =>
+              `<li><span>${idx + 1}</span><b>${entry.name}</b><em>${entry.score}</em></li>`
+          )
+          .join("");
+      }
+
+      function setActiveTab(which) {
+        const isAllTime = which === "all-time";
+        tabAllTime.classList.toggle("board__tab--active", isAllTime);
+        tabToday.classList.toggle("board__tab--active", !isAllTime);
+        renderLeaderboard(isAllTime ? allTimeData : todayData);
+      }
+
+      tabAllTime.addEventListener("click", () => setActiveTab("all-time"));
+      tabToday.addEventListener("click", () => setActiveTab("today"));
+    </script>
+  </body>
+</html>

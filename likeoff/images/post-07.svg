@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1125" viewBox="0 0 900 1125">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#1f2b3a"/>
+      <stop offset="1" stop-color="#0f1420"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1125" fill="url(#g)"/>
+  <rect x="60" y="70" width="780" height="80" rx="16" fill="#111a26" stroke="rgba(255,255,255,0.10)"/>
+  <circle cx="110" cy="110" r="26" fill="#9bb0ff" opacity="0.75"/>
+  <rect x="155" y="92" width="270" height="16" rx="8" fill="rgba(232,236,246,0.85)"/>
+  <rect x="155" y="118" width="175" height="12" rx="6" fill="rgba(169,178,199,0.75)"/>
+  <rect x="60" y="185" width="780" height="720" rx="18" fill="#0b0d12" stroke="rgba(255,255,255,0.10)"/>
+  <rect x="95" y="235" width="710" height="18" rx="9" fill="rgba(232,236,246,0.82)"/>
+  <rect x="95" y="270" width="540" height="18" rx="9" fill="rgba(232,236,246,0.78)"/>
+  <rect x="95" y="305" width="710" height="18" rx="9" fill="rgba(232,236,246,0.76)"/>
+  <rect x="95" y="340" width="610" height="18" rx="9" fill="rgba(232,236,246,0.70)"/>
+  <rect x="95" y="405" width="710" height="420" rx="16" fill="#121723" stroke="rgba(255,255,255,0.10)"/>
+  <text x="450" y="985" text-anchor="middle" font-family="ui-sans-serif, system-ui, -apple-system" font-size="40" fill="rgba(232,236,246,0.92)" font-weight="800">Placeholder Post 07</text>
+  <text x="450" y="1035" text-anchor="middle" font-family="ui-sans-serif, system-ui, -apple-system" font-size="20" fill="rgba(169,178,199,0.85)">Drop real screenshots into /images later</text>
+</svg>
