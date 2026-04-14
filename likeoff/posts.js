@@ -1,16 +1,25 @@
-// Phase 1: 10 placeholder posts (replace later with real screenshots)
-// Exposes a global `POSTS` array consumed by script.js.
+// Real screenshots: filename (before extension) is the like count.
+// Files live in likeoff/posts/ (see script.js for URL resolution).
 
 window.POSTS = [
-  { image: "post-01.svg", likes: 124, caption: "Hot take about productivity." },
-  { image: "post-02.svg", likes: 980, caption: "Founder story thread." },
-  { image: "post-03.svg", likes: 412, caption: "Job search humblebrag." },
-  { image: "post-04.svg", likes: 67, caption: "A short lesson learned." },
-  { image: "post-05.svg", likes: 1500, caption: "Viral AI post screenshot." },
-  { image: "post-06.svg", likes: 240, caption: "Conference recap carousel." },
-  { image: "post-07.svg", likes: 802, caption: "Leadership platitudes." },
-  { image: "post-08.svg", likes: 35, caption: "First week at new role!" },
-  { image: "post-09.svg", likes: 1299, caption: "Big announcement post." },
-  { image: "post-10.svg", likes: 510, caption: "Controversial poll results." },
+  { image: "./posts/10.png", likes: 10, caption: "" },
+  { image: "./posts/15.png", likes: 15, caption: "" },
+  { image: "./posts/60.png", likes: 60, caption: "" },
+  { image: "./posts/80.png", likes: 80, caption: "" },
+  { image: "./posts/90.png", likes: 90, caption: "" },
+  { image: "./posts/180.png", likes: 180, caption: "" },
+  { image: "./posts/300.png", likes: 300, caption: "" },
+  { image: "./posts/320.png", likes: 320, caption: "" },
+  { image: "./posts/600.png", likes: 600, caption: "" },
+  { image: "./posts/615.png", likes: 615, caption: "" },
+  { image: "./posts/650.png", likes: 650, caption: "" },
+  { image: "./posts/770.png", likes: 770, caption: "" },
+  { image: "./posts/1000.png", likes: 1000, caption: "" },
+  { image: "./posts/2000.png", likes: 2000, caption: "" },
+  { image: "./posts/2100.png", likes: 2100, caption: "" },
+  { image: "./posts/2500.png", likes: 2500, caption: "" },
+  { image: "./posts/4400.png", likes: 4400, caption: "" },
+  { image: "./posts/7600.png", likes: 7600, caption: "" },
+  { image: "./posts/8700.png", likes: 8700, caption: "" },
+  { image: "./posts/9200.png", likes: 9200, caption: "" },
 ];
-

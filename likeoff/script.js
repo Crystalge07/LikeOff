@@ -19,8 +19,6 @@
   const cardRight = $("cardRight");
   const imgLeft = $("imgLeft");
   const imgRight = $("imgRight");
-  const capLeft = $("capLeft");
-  const capRight = $("capRight");
   const hint = $("hint");
 
   const finalStreakText = $("finalStreakText");
@@ -50,6 +48,7 @@
     }
     acceptingInput = false;
     setActiveScreen(screenStart);
+    initHomePreview();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -73,17 +72,103 @@
     if (badge) badge.remove();
   }
 
-  function addBadge(cardEl, text) {
-    clearBadges(cardEl);
-    const badge = document.createElement("div");
-    badge.className = "resultBadge";
-    badge.textContent = text;
-    cardEl.style.position = "relative";
-    cardEl.appendChild(badge);
+  /** Resolves image paths against the page URL so ./posts/… works from file:// and any server root. */
+  function postImageUrl(image) {
+    const path = image.includes("/") ? image : `./images/${image}`;
+    try {
+      return new URL(path, document.baseURI).href;
+    } catch {
+      return path;
+    }
   }
+
+  const maxScreenshotHeightPx = () => Math.min(Math.round(window.innerHeight * 0.85), 1024);
+
+  /** Scale image down so the whole bitmap fits inside its wrapper (same math as object-fit: contain). */
+  function fitPostScreenshot(img) {
+    const wrap = img && img.parentElement;
+    if (!wrap || !img.naturalWidth || !img.naturalHeight) return;
+    const maxW = wrap.getBoundingClientRect().width;
+    const maxH = maxScreenshotHeightPx();
+    if (maxW < 4) {
+      requestAnimationFrame(() => fitPostScreenshot(img));
+      return;
+    }
+    const nw = img.naturalWidth;
+    const nh = img.naturalHeight;
+    const scale = Math.min(1, maxW / nw, maxH / nh);
+    const w = Math.max(1, Math.round(nw * scale));
+    const h = Math.max(1, Math.round(nh * scale));
+    img.style.width = `${w}px`;
+    img.style.height = `${h}px`;
+  }
+
+  function clearScreenshotLayout(img) {
+    if (!img) return;
+    img.style.width = "";
+    img.style.height = "";
+  }
+
+  function setScreenshotSrc(img, url) {
+    if (!img) return;
+    clearScreenshotLayout(img);
+    const onDone = () => requestAnimationFrame(() => fitPostScreenshot(img));
+    img.addEventListener("load", onDone, { once: true });
+    img.src = url;
+    if (img.complete && img.naturalWidth) onDone();
+  }
+
+  function setupScreenshotFitObservers() {
+    const wraps = [];
+    if (imgLeft && imgLeft.parentElement) wraps.push(imgLeft.parentElement);
+    if (imgRight && imgRight.parentElement) wraps.push(imgRight.parentElement);
+    const preview = document.getElementById("previewDuel");
+    if (preview) {
+      preview.querySelectorAll(".duel__shotWrap").forEach((el) => wraps.push(el));
+    }
+    for (const wrap of wraps) {
+      if (!wrap || wrap.dataset.fitObserved) continue;
+      wrap.dataset.fitObserved = "1";
+      const ro = new ResizeObserver(() => {
+        const im = wrap.querySelector("img");
+        if (im && im.naturalWidth) fitPostScreenshot(im);
+      });
+      ro.observe(wrap);
+    }
+  }
+
+  let resizeFitTimer = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeFitTimer);
+    resizeFitTimer = setTimeout(() => {
+      [imgLeft, imgRight, ...document.querySelectorAll("#previewDuel .duel__shotWrap img")].forEach(
+        (im) => {
+          if (im && im.naturalWidth) fitPostScreenshot(im);
+        }
+      );
+    }, 80);
+  });
 
   function randInt(maxExclusive) {
     return Math.floor(Math.random() * maxExclusive);
+  }
+
+  /** Home screen “Live game preview” uses the same assets as the real game. */
+  function initHomePreview() {
+    const wrap = document.getElementById("previewDuel");
+    if (!wrap || POSTS.length < 2) return;
+    const a = randInt(POSTS.length);
+    let b = randInt(POSTS.length);
+    while (b === a) b = randInt(POSTS.length);
+    const imgL = wrap.querySelector('[data-preview="left"]');
+    const imgR = wrap.querySelector('[data-preview="right"]');
+    const left = POSTS[a];
+    const right = POSTS[b];
+    if (!imgL || !imgR) return;
+    setScreenshotSrc(imgL, postImageUrl(left.image));
+    setScreenshotSrc(imgR, postImageUrl(right.image));
+    imgL.alt = left.caption ? left.caption : "LinkedIn post screenshot";
+    imgR.alt = right.caption ? right.caption : "LinkedIn post screenshot";
   }
 
   function drawTwoDistinct() {
@@ -101,12 +186,10 @@
     const left = POSTS[pair.leftIdx];
     const right = POSTS[pair.rightIdx];
 
-    imgLeft.src = `./images/${left.image}`;
-    imgRight.src = `./images/${right.image}`;
+    setScreenshotSrc(imgLeft, postImageUrl(left.image));
+    setScreenshotSrc(imgRight, postImageUrl(right.image));
     imgLeft.alt = left.caption ? left.caption : "LinkedIn post screenshot";
     imgRight.alt = right.caption ? right.caption : "LinkedIn post screenshot";
-    capLeft.textContent = left.caption || "";
-    capRight.textContent = right.caption || "";
   }
 
   function startNewGame() {
@@ -172,9 +255,6 @@
       cardLeft.classList.add("card--bad");
     }
 
-    addBadge(cardLeft, `${leftLikes.toLocaleString()} likes`);
-    addBadge(cardRight, `${rightLikes.toLocaleString()} likes`);
-
     if (chosenCorrect) {
       hint.textContent = "Correct. Next round…";
       streak += 1;
@@ -214,5 +294,7 @@
 
   // Initial screen
   setActiveScreen(screenStart);
+  setupScreenshotFitObservers();
+  initHomePreview();
 })();
 

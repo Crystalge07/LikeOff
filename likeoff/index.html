@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LikeOff</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
@@ -34,58 +34,21 @@
         <section class="container preview">
           <div class="panel">
             <div class="panel__label">Live game preview</div>
-            <div class="panel__streak">7</div>
+            <div class="panel__streak">0</div>
             <div class="panel__sub">current streak</div>
-            <div class="duel">
-              <article class="duel__card">
-                <div class="duel__topbar"></div>
-                <div class="duel__head">
-                  <div class="avatar">JM</div>
-                  <div>
-                    <strong>Jake Morrison <span class="degree">3rd</span></strong>
-                    <small>Founder at ECDI</small>
-                  </div>
+            <div class="duel" id="previewDuel">
+              <div class="duel__card duel__card--shot">
+                <div class="duel__shotWrap">
+                  <img data-preview="left" alt="" />
                 </div>
-                <p>
-                  I got rejected by 47 companies. Then I built one worth $40M. Rejection is
-                  just redirection. <span class="see-more">...see more</span>
-                </p>
-                <div class="duel__react">
-                  <div class="reactDots"><span></span><span></span><span></span></div>
-                  <span class="reactPill">??? reactions</span>
+              </div>
+              <div class="duel__vs" aria-hidden="true">VS</div>
+              <div class="duel__card duel__card--shot">
+                <div class="duel__shotWrap">
+                  <img data-preview="right" alt="" />
                 </div>
-                <div class="duel__actions">
-                  <span>Like</span>
-                  <span>Comment</span>
-                  <span>Repost</span>
-                </div>
-              </article>
-              <div class="duel__vs">VS</div>
-              <article class="duel__card">
-                <div class="duel__topbar"></div>
-                <div class="duel__head">
-                  <div class="avatar avatar--green">SR</div>
-                  <div>
-                    <strong>Sarah Reynolds <span class="degree">2nd</span></strong>
-                    <small>Head of People</small>
-                  </div>
-                </div>
-                <p>
-                  Unpopular opinion: work-life balance is a myth. People who change the world
-                  are obsessed. <span class="see-more">...see more</span>
-                </p>
-                <div class="duel__react">
-                  <div class="reactDots"><span></span><span></span><span></span></div>
-                  <span class="reactPill">??? reactions</span>
-                </div>
-                <div class="duel__actions">
-                  <span>Like</span>
-                  <span>Comment</span>
-                  <span>Repost</span>
-                </div>
-              </article>
+              </div>
             </div>
-            <div class="duel__hint">Tap the post you think has <b>more reactions</b>.</div>
           </div>
         </section>
 
@@ -121,17 +84,11 @@
               <div class="game-card__media">
                 <img id="imgLeft" alt="" />
               </div>
-              <div class="game-card__meta">
-                <div class="game-card__caption" id="capLeft"></div>
-              </div>
             </button>
             <div class="game-vs" aria-hidden="true">VS</div>
             <button type="button" class="game-card" id="cardRight" aria-label="Choose right post">
               <div class="game-card__media">
                 <img id="imgRight" alt="" />
-              </div>
-              <div class="game-card__meta">
-                <div class="game-card__caption" id="capRight"></div>
               </div>
             </button>
           </div>

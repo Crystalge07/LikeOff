@@ -173,7 +173,7 @@ h1 span { color: var(--linkedin-blue); }
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 18px;
-  align-items: center;
+  align-items: start;
 }
 
 .duel__vs {
@@ -185,9 +185,11 @@ h1 span { color: var(--linkedin-blue); }
   font-weight: 700;
   display: grid;
   place-items: center;
+  align-self: center;
 }
 
 .duel__card {
+  min-width: 0;
   background: #fff;
   border: 1px solid #e0dfdc;
   border-radius: 12px;
@@ -200,6 +202,12 @@ h1 span { color: var(--linkedin-blue); }
   border-color: #cfcdc9;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
+
+.duel__card--shot {
+  padding: 0;
+  overflow: visible;
+}
+
 .duel__topbar {
   height: 4px;
   background: #0a66c2;
@@ -464,7 +472,7 @@ h1 span { color: var(--linkedin-blue); }
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 16px;
-  align-items: center;
+  align-items: start;
 }
 
 .game-vs {
@@ -477,16 +485,19 @@ h1 span { color: var(--linkedin-blue); }
   font-size: 14px;
   display: grid;
   place-items: center;
+  align-self: center;
 }
 
 .game-card {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 1px solid #e0dfdc;
   border-radius: 12px;
   background: #fff;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   text-align: left;
   font: inherit;
@@ -513,29 +524,24 @@ h1 span { color: var(--linkedin-blue); }
   box-shadow: 0 0 0 1px rgba(224, 59, 59, 0.35);
 }
 
-.game-card__media {
+/* Screenshot box: width from grid; height comes from the <img> (set by script to “contain” in the box). */
+.game-card__media,
+.duel__shotWrap {
   position: relative;
-  aspect-ratio: 4 / 3;
-  background: #f3f2ef;
-}
-
-.game-card__media img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  max-width: 100%;
+  min-width: 0;
+  background: #f3f2ef;
+  text-align: center;
+  line-height: 0;
 }
 
-.game-card__meta {
-  padding: 6px 12px 8px;
-  border-top: 1px solid #e0dfdc;
-}
-
-.game-card__caption {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.35;
-  min-height: 1.2em;
+.game-card__media img,
+.duel__shotWrap img {
+  display: inline-block;
+  vertical-align: top;
+  max-width: none;
+  height: auto;
 }
 
 .game-hint {
