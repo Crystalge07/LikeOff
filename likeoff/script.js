@@ -142,18 +142,37 @@
     }, 80);
   });
 
-  function randInt(maxExclusive) {
-    return Math.floor(Math.random() * maxExclusive);
+  function shuffleInPlace(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
   }
 
+  /** One entry per image path so the same file never appears twice in a run. */
+  function buildShuffledSessionDeck() {
+    const seen = new Set();
+    const indices = [];
+    for (let i = 0; i < POSTS.length; i++) {
+      const path = POSTS[i].image;
+      if (seen.has(path)) continue;
+      seen.add(path);
+      indices.push(i);
+    }
+    return shuffleInPlace(indices);
+  }
+
+  /** Next matchup: two posts never seen this session; order (left/right) is random too. */
   function drawTwoDistinct() {
     if (remainingIndices.length < 2) return null;
-    const aPos = randInt(remainingIndices.length);
-    const a = remainingIndices[aPos];
-    remainingIndices.splice(aPos, 1);
-    const bPos = randInt(remainingIndices.length);
-    const b = remainingIndices[bPos];
-    remainingIndices.splice(bPos, 1);
+    let a = remainingIndices.pop();
+    let b = remainingIndices.pop();
+    if (Math.random() < 0.5) {
+      const t = a;
+      a = b;
+      b = t;
+    }
     return { leftIdx: a, rightIdx: b };
   }
 
@@ -175,7 +194,7 @@
 
     streak = 0;
     setStreakDisplay();
-    remainingIndices = POSTS.map((_, i) => i);
+    remainingIndices = buildShuffledSessionDeck();
     currentPair = null;
     acceptingInput = false;
 
