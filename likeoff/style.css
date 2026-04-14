@@ -28,7 +28,6 @@ html {
   background-attachment: fixed;
   background-repeat: no-repeat;
   scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
   scroll-padding-bottom: var(--page-bottom-pad);
   scroll-padding-top: 0;
 }
@@ -37,6 +36,7 @@ html {
     scroll-behavior: auto;
   }
 }
+
 body {
   background: var(--linkedin-feed);
   color: var(--text-main);
@@ -53,8 +53,6 @@ body {
 .nav {
   background: #ffffff;
   border-bottom: 1px solid #e0dfdc;
-  scroll-snap-align: start;
-  scroll-snap-stop: normal;
 }
 
 .nav__inner {
@@ -173,7 +171,7 @@ h1 span { color: var(--linkedin-blue); }
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 18px;
-  align-items: start;
+  align-items: center;
 }
 
 .duel__vs {
@@ -201,11 +199,6 @@ h1 span { color: var(--linkedin-blue); }
   transform: translateY(-2px);
   border-color: #cfcdc9;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-}
-
-.duel__card--shot {
-  padding: 0;
-  overflow: visible;
 }
 
 .duel__topbar {
@@ -360,15 +353,6 @@ h1 span { color: var(--linkedin-blue); }
   font-size: 13px;
 }
 
-.scroll-snap-end {
-  height: 1px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  pointer-events: none;
-  visibility: hidden;
-}
-
 .board { margin-top: 42px; }
 .board__head {
   display: flex;
@@ -494,50 +478,46 @@ h1 span { color: var(--linkedin-blue); }
   min-width: 0;
   margin: 0;
   padding: 0;
-  border: 1px solid #e0dfdc;
-  border-radius: 12px;
-  background: #fff;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   overflow: visible;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   font: inherit;
-  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+  transition: transform 140ms ease, opacity 140ms ease;
 }
 
 .game-card:hover:not(:disabled) {
   transform: translateY(-2px);
-  border-color: #cfcdc9;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
 .game-card:disabled {
   cursor: default;
 }
 
-.game-card.card--good {
-  border-color: #057642;
-  box-shadow: 0 0 0 1px rgba(5, 118, 66, 0.35);
+.game-card.card--good .game-card__media img {
+  outline: 3px solid #057642;
+  outline-offset: 3px;
 }
 
-.game-card.card--bad {
-  border-color: #e03b3b;
-  box-shadow: 0 0 0 1px rgba(224, 59, 59, 0.35);
+.game-card.card--bad .game-card__media img {
+  outline: 3px solid #e03b3b;
+  outline-offset: 3px;
 }
 
-/* Screenshot box: width from grid; height comes from the <img> (set by script to “contain” in the box). */
-.game-card__media,
-.duel__shotWrap {
+/* Game screenshots: no frame; script sets pixel size so the full image fits the column. */
+.game-card__media {
   position: relative;
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  background: #f3f2ef;
+  background: transparent;
   text-align: center;
   line-height: 0;
 }
 
-.game-card__media img,
-.duel__shotWrap img {
+.game-card__media img {
   display: inline-block;
   vertical-align: top;
   max-width: none;

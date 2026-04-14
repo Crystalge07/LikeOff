@@ -48,7 +48,6 @@
     }
     acceptingInput = false;
     setActiveScreen(screenStart);
-    initHomePreview();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -122,10 +121,6 @@
     const wraps = [];
     if (imgLeft && imgLeft.parentElement) wraps.push(imgLeft.parentElement);
     if (imgRight && imgRight.parentElement) wraps.push(imgRight.parentElement);
-    const preview = document.getElementById("previewDuel");
-    if (preview) {
-      preview.querySelectorAll(".duel__shotWrap").forEach((el) => wraps.push(el));
-    }
     for (const wrap of wraps) {
       if (!wrap || wrap.dataset.fitObserved) continue;
       wrap.dataset.fitObserved = "1";
@@ -141,34 +136,14 @@
   window.addEventListener("resize", () => {
     clearTimeout(resizeFitTimer);
     resizeFitTimer = setTimeout(() => {
-      [imgLeft, imgRight, ...document.querySelectorAll("#previewDuel .duel__shotWrap img")].forEach(
-        (im) => {
-          if (im && im.naturalWidth) fitPostScreenshot(im);
-        }
-      );
+      [imgLeft, imgRight].forEach((im) => {
+        if (im && im.naturalWidth) fitPostScreenshot(im);
+      });
     }, 80);
   });
 
   function randInt(maxExclusive) {
     return Math.floor(Math.random() * maxExclusive);
-  }
-
-  /** Home screen “Live game preview” uses the same assets as the real game. */
-  function initHomePreview() {
-    const wrap = document.getElementById("previewDuel");
-    if (!wrap || POSTS.length < 2) return;
-    const a = randInt(POSTS.length);
-    let b = randInt(POSTS.length);
-    while (b === a) b = randInt(POSTS.length);
-    const imgL = wrap.querySelector('[data-preview="left"]');
-    const imgR = wrap.querySelector('[data-preview="right"]');
-    const left = POSTS[a];
-    const right = POSTS[b];
-    if (!imgL || !imgR) return;
-    setScreenshotSrc(imgL, postImageUrl(left.image));
-    setScreenshotSrc(imgR, postImageUrl(right.image));
-    imgL.alt = left.caption ? left.caption : "LinkedIn post screenshot";
-    imgR.alt = right.caption ? right.caption : "LinkedIn post screenshot";
   }
 
   function drawTwoDistinct() {
@@ -295,6 +270,5 @@
   // Initial screen
   setActiveScreen(screenStart);
   setupScreenshotFitObservers();
-  initHomePreview();
 })();
 
