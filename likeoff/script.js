@@ -26,9 +26,36 @@
   const streakValue = $("streakValue");
 
   const POSTS = Array.isArray(window.POSTS) ? window.POSTS : [];
+  const BEST_STREAK_KEY = "likeoff.bestStreak";
 
   /** Plain JS variable per spec */
   let streak = 0;
+  let bestStreak = 0;
+
+  function loadBestStreak() {
+    try {
+      const raw = window.localStorage.getItem(BEST_STREAK_KEY);
+      const value = Number(raw);
+      if (Number.isFinite(value) && value >= 0) return Math.floor(value);
+    } catch {
+      // localStorage may be unavailable in some contexts; keep best streak in-memory.
+    }
+    return 0;
+  }
+
+  function saveBestStreak(nextBest) {
+    try {
+      window.localStorage.setItem(BEST_STREAK_KEY, String(nextBest));
+    } catch {
+      // Best effort only.
+    }
+  }
+
+  function updateBestStreak() {
+    if (streak <= bestStreak) return;
+    bestStreak = streak;
+    saveBestStreak(bestStreak);
+  }
 
   let remainingIndices = [];
   let currentPair = null; // { leftIdx, rightIdx }
@@ -56,7 +83,7 @@
   }
 
   function resetRoundUI() {
-    hint.textContent = "Which post got more likes?";
+    hint.textContent = "Which post went more viral?";
     setStreakDisplay();
     clearBadges(cardLeft);
     clearBadges(cardRight);
@@ -215,7 +242,7 @@
     const pair = drawTwoDistinct();
     if (!pair) {
       // No more posts to show: win
-      winText.textContent = `You exhausted all posts with a streak of ${streak}.`;
+      winText.textContent = "You exhausted all posts.";
       setActiveScreen(screenWin);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -252,6 +279,7 @@
     if (chosenCorrect) {
       hint.textContent = "Correct. Next round…";
       streak += 1;
+      updateBestStreak();
       setStreakDisplay();
       revealTimer = setTimeout(() => {
         revealTimer = null;
@@ -261,7 +289,7 @@
       hint.textContent = "Wrong. Game over…";
       revealTimer = setTimeout(() => {
         revealTimer = null;
-        finalStreakText.textContent = `Your streak: ${streak}`;
+        finalStreakText.textContent = `Your longest streak: ${bestStreak}`;
         setActiveScreen(screenGameOver);
         window.scrollTo({ top: 0, behavior: "smooth" });
       }, 1100);
@@ -287,6 +315,10 @@
   });
 
   // Initial screen
+  bestStreak = loadBestStreak();
+  if (finalStreakText) {
+    finalStreakText.textContent = `Your longest streak: ${bestStreak}`;
+  }
   setActiveScreen(screenStart);
   setupScreenshotFitObservers();
 })();
