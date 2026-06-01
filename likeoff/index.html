@@ -97,9 +97,15 @@
 
         <section class="container">
           <div class="stats">
-            <div class="stat"><strong>100</strong><small>Real LinkedIn posts to judge</small></div>
-            <div class="stat"><strong>2.4M</strong><small>Posts judged by players</small></div>
-            <div class="stat"><strong>8,421</strong><small>Unique players all time</small></div>
+            <div class="stat">
+              <strong id="statPostCount">0</strong><small>Real LinkedIn posts to judge</small>
+            </div>
+            <div class="stat">
+              <strong id="statPostsJudged">0</strong><small>Posts judged by players</small>
+            </div>
+            <div class="stat">
+              <strong id="statUniquePlayers">0</strong><small>Unique players all time</small>
+            </div>
           </div>
         </section>
 
@@ -160,73 +166,37 @@
       </section>
     </main>
 
+    <div id="nameModal" class="name-modal" hidden>
+      <div class="name-modal__backdrop" aria-hidden="true"></div>
+      <div
+        class="name-modal__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="nameModalTitle"
+      >
+        <h2 class="name-modal__title" id="nameModalTitle">Enter your name for the leaderboard</h2>
+        <p class="name-modal__sub">Shown on the public leaderboard. You’ll only be asked once on this device.</p>
+        <form id="nameForm" class="name-modal__form">
+          <input
+            id="nameInput"
+            class="name-modal__input"
+            type="text"
+            name="displayName"
+            maxlength="24"
+            autocomplete="nickname"
+            placeholder="Your name"
+            required
+          />
+          <p id="nameModalError" class="name-modal__error" role="alert"></p>
+          <button type="submit" class="btn btn--solid name-modal__submit">Save &amp; continue</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
     <script src="./posts.js"></script>
+    <script src="./leaderboard.js"></script>
     <script src="./script.js"></script>
-    <script>
-      const allTimeData = [
-        { name: "alex_builds", score: 34 },
-        { name: "notalinkedinuser", score: 28 },
-        { name: "sara_k", score: 21 },
-        { name: "miketech99", score: 19 },
-        { name: "jess_m", score: 14 },
-        { name: "devin_codes", score: 13 },
-        { name: "lena_pm", score: 12 },
-        { name: "omartech", score: 11 },
-        { name: "buildwithamy", score: 10 },
-        { name: "growthgreg", score: 9 },
-      ];
-
-      const todayData = [
-        { name: "milo_dev", score: 18 },
-        { name: "tammyk", score: 15 },
-        { name: "productbro", score: 13 },
-        { name: "jamie_x", score: 11 },
-        { name: "rory.codes", score: 9 },
-        { name: "sre_sam", score: 8 },
-        { name: "nina_builds", score: 8 },
-        { name: "harry_ui", score: 7 },
-        { name: "data_dylan", score: 7 },
-        { name: "founderfran", score: 6 },
-      ];
-
-      const tabAllTime = document.getElementById("tabAllTime");
-      const tabToday = document.getElementById("tabToday");
-      const leaderboardList = document.getElementById("leaderboardList");
-
-      function renderLeaderboard(data) {
-        leaderboardList.classList.add("board--fading");
-        leaderboardList.innerHTML = data
-          .map(
-            (entry, idx) =>
-              `<li><span>${idx + 1}</span><b>${entry.name}</b><em>${entry.score}</em></li>`
-          )
-          .join("");
-        requestAnimationFrame(() => leaderboardList.classList.remove("board--fading"));
-      }
-
-      function setActiveTab(which) {
-        const isAllTime = which === "all-time";
-        tabAllTime.classList.toggle("board__tab--active", isAllTime);
-        tabToday.classList.toggle("board__tab--active", !isAllTime);
-        renderLeaderboard(isAllTime ? allTimeData : todayData);
-      }
-
-      tabAllTime.addEventListener("click", () => setActiveTab("all-time"));
-      tabToday.addEventListener("click", () => setActiveTab("today"));
-      setActiveTab("all-time");
-
-      const leaderboardLink = document.querySelector('a[href="#leaderboard"]');
-      const leaderboardSection = document.getElementById("leaderboard");
-      if (leaderboardLink && leaderboardSection) {
-        leaderboardLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-          leaderboardSection.scrollIntoView({
-            behavior: reduce ? "auto" : "smooth",
-            block: "start",
-          });
-        });
-      }
-    </script>
   </body>
 </html>

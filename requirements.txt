@@ -1,0 +1,2 @@
+# Optional Python tooling for this repo (local dev scripts, Supabase CLI helpers, etc.)
+# Install: source .venv/bin/activate && pip install -r requirements.txt

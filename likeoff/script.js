@@ -1,4 +1,4 @@
-/* Phase 1: core game logic only (no name system, no Supabase, no leaderboard) */
+/* Core game logic; leaderboards via leaderboard.js + Supabase */
 
 (() => {
   const $ = (id) => document.getElementById(id);
@@ -76,6 +76,13 @@
     acceptingInput = false;
     setActiveScreen(screenStart);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function notifyRunFinished() {
+    const runStreak = streak;
+    if (window.LikeOffLeaderboard?.onRunFinished) {
+      void window.LikeOffLeaderboard.onRunFinished(runStreak);
+    }
   }
 
   function setStreakDisplay() {
@@ -245,6 +252,7 @@
       winText.textContent = "You exhausted all posts.";
       setActiveScreen(screenWin);
       window.scrollTo({ top: 0, behavior: "smooth" });
+      notifyRunFinished();
       return;
     }
 
@@ -292,6 +300,7 @@
         finalStreakText.textContent = `Your longest streak: ${bestStreak}`;
         setActiveScreen(screenGameOver);
         window.scrollTo({ top: 0, behavior: "smooth" });
+        notifyRunFinished();
       }, 1100);
     }
   }

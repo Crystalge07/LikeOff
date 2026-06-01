@@ -12,18 +12,32 @@ LikeOff is a small browser game where you guess which LinkedIn post got more eng
 
 1. Open a terminal in the repo root:
    - `cd /Users/crystalge/LikeOff`
-2. Start a local server from the app folder:
+2. (Optional) Use the project virtual environment:
+   - `python3 -m venv .venv` — only needed once if `.venv` is missing
+   - `source .venv/bin/activate`
+3. Start a local server from the app folder:
    - `cd likeoff`
    - `python3 -m http.server 8080`
-3. Open your browser:
+4. Open your browser:
    - `http://127.0.0.1:8080/`
 
 ## Stop the server
 
 - Press `Ctrl + C` in the terminal running `http.server`.
 
+## Supabase (leaderboards & stats)
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. In **SQL Editor**, run the full script in [`supabase/schema.sql`](supabase/schema.sql).
+3. In **Project Settings → API**, copy **Project URL** and the **`anon` public** key.
+4. Paste them into [`likeoff/supabase-config.js`](likeoff/supabase-config.js) (see [`likeoff/supabase-config.example.js`](likeoff/supabase-config.example.js)).
+5. Restart the local server and hard-refresh the browser.
+
+Leaderboards and homepage stats stay at `0` / empty until config is set. Full product rules: [`LEADERBOARD_SPEC.md`](LEADERBOARD_SPEC.md).
+
 ## Troubleshooting
 
 - **Port already in use**: change the port, e.g. `python3 -m http.server 3000`, then open `http://127.0.0.1:3000/`.
 - **Python not found**: install Python 3 and retry with `python3`.
 - **Opening `index.html` directly looks broken**: run the local server so image/script paths resolve correctly.
+- **Leaderboard not updating**: check the browser console; confirm `schema.sql` was run and keys are in `supabase-config.js`.

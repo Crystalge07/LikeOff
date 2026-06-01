@@ -413,6 +413,13 @@ h1 span { color: var(--linkedin-blue); }
 .board li span { color: #666; }
 .board li b { font-weight: 500; }
 .board li em { font-style: normal; font-weight: 700; color: #1f1f1f; }
+.board li.board__empty {
+  display: block;
+  padding: 20px 14px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
 
 #screenStart {
   padding-bottom: 12px;
@@ -582,6 +589,72 @@ h1 span { color: var(--linkedin-blue); }
 
 #leaderboardList.board--fading {
   opacity: 0.55;
+}
+
+.name-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.name-modal[hidden] {
+  display: none;
+}
+.name-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+.name-modal__panel {
+  position: relative;
+  width: min(420px, 100%);
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+.name-modal__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.name-modal__sub {
+  margin: 0 0 16px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.name-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.name-modal__input {
+  width: 100%;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-family: inherit;
+}
+.name-modal__input:focus {
+  outline: 2px solid var(--linkedin-blue);
+  outline-offset: 2px;
+}
+.name-modal__error {
+  margin: 0;
+  min-height: 1.2em;
+  color: #b24020;
+  font-size: 13px;
+}
+.name-modal__submit {
+  width: 100%;
+  border: 0;
+  cursor: pointer;
 }
 
 @media (max-width: 860px) {
