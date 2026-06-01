@@ -5,6 +5,8 @@
 (() => {
   const PLAYER_ID_KEY = "likeoff.playerId";
   const DISPLAY_NAME_KEY = "likeoff.displayName";
+  /** Homepage marketing stat (actual deck size still comes from posts.js). */
+  const DISPLAY_POST_COUNT = 100;
 
   const tabAllTime = document.getElementById("tabAllTime");
   const tabToday = document.getElementById("tabToday");
@@ -144,7 +146,7 @@
   }
 
   async function refreshStats() {
-    if (statPostCount) statPostCount.textContent = formatCount(countUniquePosts());
+    if (statPostCount) statPostCount.textContent = formatCount(DISPLAY_POST_COUNT);
 
     if (!isConfigured()) {
       if (statPostsJudged) statPostsJudged.textContent = "0";
@@ -268,7 +270,7 @@
         "LikeOff: Copy likeoff/supabase-config.example.js → supabase-config.js and add your Supabase URL + Publishable key."
       );
       renderLeaderboard([]);
-      if (statPostCount) statPostCount.textContent = formatCount(countUniquePosts());
+      if (statPostCount) statPostCount.textContent = formatCount(DISPLAY_POST_COUNT);
       if (statPostsJudged) statPostsJudged.textContent = "0";
       if (statUniquePlayers) statUniquePlayers.textContent = "0";
       return;
