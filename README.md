@@ -30,12 +30,10 @@ LikeOff is a small browser game where you guess which LinkedIn post got more eng
 1. Create a project at [supabase.com](https://supabase.com).
 2. In **SQL Editor**, run the full script in [`supabase/schema.sql`](supabase/schema.sql).
 3. In **Project Settings → API**, copy **Project URL** and the **Publishable** key (`sb_publishable_…`).
-4. Create your local config (gitignored — won’t be pushed):
-   - `cp likeoff/supabase-config.example.js likeoff/supabase-config.js`
-   - Paste **Project URL** and **Publishable key** into `likeoff/supabase-config.js` as `SUPABASE_PUBLISHABLE_KEY`
+4. Set **Project URL** and **Publishable key** in [`likeoff/supabase-config.js`](likeoff/supabase-config.js) (or copy from [`likeoff/supabase-config.example.js`](likeoff/supabase-config.example.js)).
 5. Restart the local server and hard-refresh the browser.
 
-`likeoff/supabase-config.js` is listed in `.gitignore` and `.cursorignore`. Only `supabase-config.example.js` is tracked in git.
+The Publishable key (`sb_publishable_…`) is safe in the repo with RLS. **Never** commit the secret key (`sb_secret_…`).
 
 Leaderboards and homepage stats stay at `0` / empty until config is set. Full product rules: [`LEADERBOARD_SPEC.md`](LEADERBOARD_SPEC.md).
 

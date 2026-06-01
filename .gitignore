@@ -24,11 +24,10 @@ htmlcov/
 dist/
 build/
 
-# Environment & secrets
+# Environment & secrets (never commit sb_secret_… or service role keys)
 .env
 .env.*
 !.env.example
-likeoff/supabase-config.js
 likeoff/supabase-config.local.js
 
 # Node (optional tooling)
