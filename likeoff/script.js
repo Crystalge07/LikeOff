@@ -115,66 +115,20 @@
     }
   }
 
-  const maxScreenshotHeightPx = () => Math.min(Math.round(window.innerHeight * 0.85), 1024);
-
-  /** Scale image down so the whole bitmap fits inside its wrapper (same math as object-fit: contain). */
-  function fitPostScreenshot(img) {
-    const wrap = img && img.parentElement;
-    if (!wrap || !img.naturalWidth || !img.naturalHeight) return;
-    const maxW = wrap.getBoundingClientRect().width;
-    const maxH = maxScreenshotHeightPx();
-    if (maxW < 4) {
-      requestAnimationFrame(() => fitPostScreenshot(img));
-      return;
-    }
-    const nw = img.naturalWidth;
-    const nh = img.naturalHeight;
-    const scale = Math.min(1, maxW / nw, maxH / nh);
-    const w = Math.max(1, Math.round(nw * scale));
-    const h = Math.max(1, Math.round(nh * scale));
-    img.style.width = `${w}px`;
-    img.style.height = `${h}px`;
-  }
-
-  function clearScreenshotLayout(img) {
-    if (!img) return;
-    img.style.width = "";
-    img.style.height = "";
-  }
+  /* CSS object-fit: contain handles all image sizing now — no JS needed. */
 
   function setScreenshotSrc(img, url) {
     if (!img) return;
-    clearScreenshotLayout(img);
-    const onDone = () => requestAnimationFrame(() => fitPostScreenshot(img));
-    img.addEventListener("load", onDone, { once: true });
     img.src = url;
-    if (img.complete && img.naturalWidth) onDone();
   }
 
-  function setupScreenshotFitObservers() {
-    const wraps = [];
-    if (imgLeft && imgLeft.parentElement) wraps.push(imgLeft.parentElement);
-    if (imgRight && imgRight.parentElement) wraps.push(imgRight.parentElement);
-    for (const wrap of wraps) {
-      if (!wrap || wrap.dataset.fitObserved) continue;
-      wrap.dataset.fitObserved = "1";
-      const ro = new ResizeObserver(() => {
-        const im = wrap.querySelector("img");
-        if (im && im.naturalWidth) fitPostScreenshot(im);
-      });
-      ro.observe(wrap);
+  /** Cache every post image so round transitions are instant. */
+  function preloadAll() {
+    for (const p of POSTS) {
+      const im = new Image();
+      im.src = postImageUrl(p.image);
     }
   }
-
-  let resizeFitTimer = 0;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeFitTimer);
-    resizeFitTimer = setTimeout(() => {
-      [imgLeft, imgRight].forEach((im) => {
-        if (im && im.naturalWidth) fitPostScreenshot(im);
-      });
-    }, 80);
-  });
 
   function shuffleInPlace(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -241,6 +195,7 @@
 
     setActiveScreen(screenGame);
     window.scrollTo({ top: 0, behavior: "smooth" });
+    preloadAll();
     nextRound();
   }
 
@@ -363,7 +318,6 @@
     finalStreakText.textContent = `Your longest streak: ${bestStreak}`;
   }
   setActiveScreen(screenStart);
-  setupScreenshotFitObservers();
   applyRoundedFavicon();
 })();
 
