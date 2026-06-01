@@ -1,4 +1,6 @@
 -- Run this in Supabase Dashboard → SQL Editor (once per project).
+-- Note: SQL role "anon" below is Supabase's built-in DB role for public API access,
+-- not the old "anon API key" label. In the app use the Publishable key (sb_publishable_…).
 
 create table if not exists public.score_runs (
   id uuid primary key default gen_random_uuid(),

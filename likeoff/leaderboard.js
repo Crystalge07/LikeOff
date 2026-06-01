@@ -82,13 +82,17 @@
     return trimmed;
   }
 
+  function getSupabaseKey() {
+    return window.SUPABASE_PUBLISHABLE_KEY || "";
+  }
+
   function isConfigured() {
-    return Boolean(window.SUPABASE_URL && window.SUPABASE_ANON_KEY && supabase);
+    return Boolean(window.SUPABASE_URL && getSupabaseKey() && supabase);
   }
 
   function initClient() {
     const url = window.SUPABASE_URL;
-    const key = window.SUPABASE_ANON_KEY;
+    const key = getSupabaseKey();
     if (!url || !key || !window.supabase) return null;
     return window.supabase.createClient(url, key);
   }
@@ -261,7 +265,7 @@
 
     if (!isConfigured()) {
       console.warn(
-        "LikeOff: Copy likeoff/supabase-config.example.js → supabase-config.js and add your Supabase URL + anon key."
+        "LikeOff: Copy likeoff/supabase-config.example.js → supabase-config.js and add your Supabase URL + Publishable key."
       );
       renderLeaderboard([]);
       if (statPostCount) statPostCount.textContent = formatCount(countUniquePosts());

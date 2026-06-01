@@ -175,7 +175,7 @@ Expose via Supabase views/RPCs or client queries with RLS.
 
 ## Security (minimum viable)
 
-- Use **anon key** in frontend; never service role in client.
+- Use the **Publishable key** (`sb_publishable_…`) in the browser; never the secret/service role key.
 - RLS: allow `INSERT` on `score_runs` with checks e.g. `streak <= 65` (max posts in deck), reasonable `display_name` length.
 - Rate-limit or edge function if abuse becomes an issue.
 - Validate/sanitize `display_name` in UI (trim, max length, strip HTML).
@@ -188,7 +188,7 @@ Expose via Supabase views/RPCs or client queries with RLS.
 |------|--------|
 | `likeoff/index.html` | Remove hardcoded `allTimeData` / `todayData`; load from Supabase; update stat elements from DB; name modal on first run end. |
 | `likeoff/script.js` | On run end, call submit flow; reuse `bestStreak` / run `streak` as appropriate (submit **this run’s** streak, not all-time best from localStorage). |
-| New `likeoff/supabase-config.js` or env | `SUPABASE_URL`, `SUPABASE_ANON_KEY` (gitignore secrets; document in README). |
+| New `likeoff/supabase-config.js` or env | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (gitignored; document in README). |
 | `likeoff/style.css` | Modal styles for name prompt. |
 
 **Important:** Leaderboard displays **this run’s streak** on submit. `localStorage` `likeoff.bestStreak` is for “Your longest streak” on game over UI only.
