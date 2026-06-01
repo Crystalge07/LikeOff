@@ -314,6 +314,40 @@
     revealOutcome({ chosenSide: "right" });
   });
 
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function applyRoundedFavicon() {
+    const link = document.querySelector('link[rel="icon"]');
+    if (!link) return;
+
+    const size = 64;
+    const radius = 12;
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      roundRect(ctx, 0, 0, size, size, radius);
+      ctx.clip();
+      ctx.drawImage(img, 0, 0, size, size);
+
+      link.type = "image/png";
+      link.href = canvas.toDataURL("image/png");
+    };
+    img.src = "./LO.png";
+  }
+
   // Initial screen
   bestStreak = loadBestStreak();
   if (finalStreakText) {
@@ -321,5 +355,6 @@
   }
   setActiveScreen(screenStart);
   setupScreenshotFitObservers();
+  applyRoundedFavicon();
 })();
 

@@ -62,10 +62,13 @@ body {
   justify-content: space-between;
 }
 
+/* LinkedIn wordmark is Myriad Pro Bold; Source Sans 3 is the closest free substitute. */
 .logo {
+  font-family: "Source Sans 3", "Myriad Pro", Myriad, "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
   font-size: calc(26px * 1.2);
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: -0.045em;
   color: #111;
 }
 .logo span { color: var(--linkedin-blue); }
