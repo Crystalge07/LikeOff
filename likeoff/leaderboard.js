@@ -5,8 +5,6 @@
 (() => {
   const PLAYER_ID_KEY = "likeoff.playerId";
   const DISPLAY_NAME_KEY = "likeoff.displayName";
-  /** Homepage marketing stat (actual deck size still comes from posts.js). */
-  const DISPLAY_POST_COUNT = 100;
 
   const tabAllTime = document.getElementById("tabAllTime");
   const tabToday = document.getElementById("tabToday");
@@ -45,6 +43,30 @@
       if (p && p.image) seen.add(p.image);
     }
     return seen.size;
+  }
+
+  /** Longest possible streak = unique posts ÷ 2 (one correct guess per pair shown). */
+  function maxAchievableStreak() {
+    const n = countUniquePosts();
+    if (n < 2) return 0;
+    return Math.floor(n / 2);
+  }
+
+  const PROFANITY_ERROR_SNIPPET = "inappropriate language";
+
+  function clearDisplayName() {
+    try {
+      localStorage.removeItem(DISPLAY_NAME_KEY);
+    } catch {
+      // Best effort.
+    }
+  }
+
+  function isProfanityInsertError(error) {
+    return (
+      error?.code === "P0001" &&
+      String(error.message || "").includes(PROFANITY_ERROR_SNIPPET)
+    );
   }
 
   function getOrCreatePlayerId() {
@@ -146,7 +168,7 @@
   }
 
   async function refreshStats() {
-    if (statPostCount) statPostCount.textContent = formatCount(DISPLAY_POST_COUNT);
+    if (statPostCount) statPostCount.textContent = formatCount(countUniquePosts());
 
     if (!isConfigured()) {
       if (statPostsJudged) statPostsJudged.textContent = "0";
@@ -210,10 +232,10 @@
     return showNameModal();
   }
 
-  async function submitRun({ playerId, displayName, streak }) {
+  async function submitRun({ playerId, displayName, streak }, allowProfanityRetry = true) {
     if (!isConfigured()) return;
-    const maxStreak = Math.max(countUniquePosts(), 1);
-    const safeStreak = Math.min(Math.max(0, Math.floor(streak)), maxStreak + 1);
+    const cap = maxAchievableStreak();
+    const safeStreak = Math.min(Math.max(0, Math.floor(streak)), cap);
 
     const { error } = await supabase.from("score_runs").insert({
       player_id: playerId,
@@ -221,7 +243,20 @@
       streak: safeStreak,
     });
 
-    if (error) console.warn("Score submit failed:", error.message);
+    if (error) {
+      if (isProfanityInsertError(error) && allowProfanityRetry) {
+        console.warn("Score submit failed:", error.message);
+        clearDisplayName();
+        if (nameModalError) {
+          nameModalError.textContent =
+            "That name isn’t allowed on the leaderboard. Please choose another.";
+        }
+        const newName = await ensureDisplayName();
+        if (!newName) return;
+        return submitRun({ playerId, displayName: newName, streak }, false);
+      }
+      console.warn("Score submit failed:", error.message);
+    }
   }
 
   async function onRunFinished(runStreak) {
@@ -270,7 +305,7 @@
         "LikeOff: Copy likeoff/supabase-config.example.js → supabase-config.js and add your Supabase URL + Publishable key."
       );
       renderLeaderboard([]);
-      if (statPostCount) statPostCount.textContent = formatCount(DISPLAY_POST_COUNT);
+      if (statPostCount) statPostCount.textContent = formatCount(countUniquePosts());
       if (statPostsJudged) statPostsJudged.textContent = "0";
       if (statUniquePlayers) statUniquePlayers.textContent = "0";
       return;

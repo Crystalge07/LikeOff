@@ -28,7 +28,7 @@ LikeOff is a small browser game where you guess which LinkedIn post got more eng
 ## Supabase (leaderboards & stats)
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. In **SQL Editor**, run the full script in [`supabase/schema.sql`](supabase/schema.sql).
+2. In **SQL Editor**, run the full script in [`supabase/schema.sql`](supabase/schema.sql) once (table, RLS, RPCs, rate limit, profanity, and triggers — everything in one file). The older [`supabase/002_rate_limit_and_profanity.sql`](supabase/002_rate_limit_and_profanity.sql) is kept for history only; its contents are already included in `schema.sql`.
 3. In **Project Settings → API**, copy **Project URL** and the **Publishable** key (`sb_publishable_…`).
 4. Set **Project URL** and **Publishable key** in [`likeoff/supabase-config.js`](likeoff/supabase-config.js) (or copy from [`likeoff/supabase-config.example.js`](likeoff/supabase-config.example.js)).
 5. Restart the local server and hard-refresh the browser.

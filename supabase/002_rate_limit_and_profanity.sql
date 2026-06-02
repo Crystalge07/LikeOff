@@ -1,14 +1,15 @@
--- Migration: rate-limit per player_id + basic profanity filter on display_name.
--- Idempotent — safe to re-run in Supabase SQL Editor.
--- Adds a BEFORE INSERT trigger; does NOT touch the existing RLS INSERT policy.
+-- Historical migration — fully folded into schema.sql (run schema.sql only for new setups).
+-- Kept for reference; safe to re-run if you applied an older schema.sql without these pieces.
 
 -- ============================================================
--- 0. Add server-set created_at column (idempotent)
---    finished_at is client-supplied (game-end time); created_at
---    is when the row was actually written — rate-limit uses this.
+-- 0. Server-set created_at (rate limit / global cap use this, not client times)
 -- ============================================================
 alter table public.score_runs
   add column if not exists created_at timestamptz not null default now();
+
+alter table public.score_runs drop constraint if exists score_runs_streak_check;
+alter table public.score_runs
+  add constraint score_runs_streak_check check (streak >= 0 and streak <= 35);
 
 -- ============================================================
 -- 1. Profanity blocklist helper
@@ -19,25 +20,12 @@ language sql
 immutable
 set search_path = public
 as $$
-  /*
-    Normalization goals (in order):
-    - lowercase
-    - collapse separators used to split words (spaces, dots, hyphens, underscores, asterisks, plus, commas, etc.)
-    - map common leetspeak + accented vowels to base letters
-    - collapse repeated chars (cuuunt -> cunt)
-
-    Matching goals:
-    - Prefer whole-word boundaries on a "wordish" normalized string (avoid Scunthorpe problem).
-    - Also catch obfuscated variants where separators/leet were used by checking a fully-collapsed string,
-      but ONLY when the input appears obfuscated (otherwise we'd block innocent substrings like "scunthorpe").
-  */
   with
     blocklist as (
-      -- Keep this list simple to extend.
       select unnest(array[
-        'fuck','shit','ass','bitch','dick','cock','cunt',
+        'fuck','shit','ass','bitch','cock','cunt',
         'nigger','nigga','faggot','retard',
-        'pussy','whore','slut','bastard','damn','piss',
+        'pussy','whore','slut','bastard',
         'asshole','motherfucker','twat'
       ]) as word
     ),
@@ -49,22 +37,17 @@ as $$
       from raw
     ),
     flags as (
-      /*
-        Only attempt "embedded in collapsed string" matching when there's evidence of obfuscation:
-        separators, common leet chars, accented vowels, or 3+ repeated chars.
-      */
       select
         s,
         (
-          s ~ '[[:space:].,_\\-\\+\\*\\^]+'  -- separators (incl caret for c^nt)
-          or s ~ '[@4]|3|[1!|]|0|[$5]|7'     -- leetspeak-ish chars
+          s ~ '[[:space:].,_\\-\\+\\*\\^]+'
+          or s ~ '[@4]|3|[1!|]|0|[$5]|7'
           or s ~ '[àáâãäåāăąèéêëēĕėęěìíîïīĭįòóôõöōŏőùúûüūŭůűų]'
-          or s ~ '(.)\\1{2,}'                -- 3+ repeats
+          or s ~ '(.)\\1{2,}'
         ) as obfuscated
       from lowered
     ),
     wordish_0 as (
-      -- Replace separators with spaces so word boundaries still exist.
       select
         obfuscated,
         regexp_replace(
@@ -78,7 +61,6 @@ as $$
     mapped as (
       select
         obfuscated,
-        -- leetspeak
         regexp_replace(
           regexp_replace(
             regexp_replace(
@@ -96,7 +78,6 @@ as $$
     unaccented as (
       select
         obfuscated,
-        -- map common accented vowels to base vowel (keep it SQL-only; no extensions required)
         regexp_replace(
           regexp_replace(
             regexp_replace(
@@ -118,7 +99,6 @@ as $$
     squashed as (
       select
         obfuscated,
-        -- collapse repeated chars and normalize whitespace
         trim(regexp_replace(regexp_replace(s, '(.)\\1+', '\\1', 'g'), '\\s+', ' ', 'g')) as wordish,
         regexp_replace(regexp_replace(s, '(.)\\1+', '\\1', 'g'), '\\s+', '', 'g') as collapsed
       from unaccented
@@ -128,9 +108,7 @@ as $$
     from blocklist b
     cross join squashed n
     where
-      -- Prefer whole-word matches (minimize false positives)
       n.wordish ~ ('\\m' || b.word || '\\M')
-      -- Also catch obfuscated variants when separators/leet were used
       or (n.obfuscated and position(b.word in n.collapsed) > 0)
   );
 $$;
@@ -141,12 +119,22 @@ $$;
 create or replace function public.score_runs_before_insert()
 returns trigger
 language plpgsql
-security definer              -- needs to query the table bypassing RLS
+security definer
 set search_path = public
 as $$
 begin
-  -- ── Rate limit: 1 insert per player_id per 2 seconds ──
-  -- Uses server-set created_at, not client-supplied finished_at.
+  new.finished_at := now();
+  new.created_at := now();
+
+  if (
+    select count(*)::int
+    from public.score_runs
+    where created_at > now() - interval '10 seconds'
+  ) >= 20 then
+    raise exception 'Too many score submissions right now. Try again in a few seconds.'
+      using errcode = 'P0001';
+  end if;
+
   if exists (
     select 1 from public.score_runs
     where player_id = new.player_id
@@ -156,7 +144,6 @@ begin
       using errcode = 'P0001';
   end if;
 
-  -- ── Profanity filter ──
   if public.name_contains_profanity(new.display_name) then
     raise exception 'Display name contains inappropriate language.'
       using errcode = 'P0001';
@@ -166,9 +153,6 @@ begin
 end;
 $$;
 
--- ============================================================
--- 3. Attach trigger (drop first so re-runs are clean)
--- ============================================================
 drop trigger if exists trg_score_runs_before_insert on public.score_runs;
 
 create trigger trg_score_runs_before_insert

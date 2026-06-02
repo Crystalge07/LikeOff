@@ -203,8 +203,11 @@
     resetRoundUI();
     const pair = drawTwoDistinct();
     if (!pair) {
-      // No more posts to show: win
-      winText.textContent = "You exhausted all posts.";
+      // Fewer than 2 posts left in the deck — can't show another pair (win, not endless rounds).
+      winText.textContent =
+        streak > 0
+          ? `You cleared the feed — streak ${streak} (${streak * 2} posts judged).`
+          : "You cleared the feed.";
       setActiveScreen(screenWin);
       window.scrollTo({ top: 0, behavior: "smooth" });
       notifyRunFinished();
