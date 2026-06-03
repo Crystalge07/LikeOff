@@ -103,7 +103,7 @@
     return `This run: ${streak} · Personal best: ${bestStreak}`;
   }
 
-  function notifyRunFinished() {
+  function notifyRunFinished({ quiet = false } = {}) {
     const runStreak = streak;
     const submit = window.LikeOffLeaderboard?.onRunFinished?.(runStreak);
 
@@ -112,11 +112,17 @@
       return;
     }
 
-    setScoreSaveStatus("Saving score to leaderboard…");
+    if (!quiet) {
+      setScoreSaveStatus("Saving score to leaderboard…");
+    }
     setEndActionsDisabled(true);
 
     void submit.then((result) => {
       setEndActionsDisabled(false);
+      if (quiet) {
+        setScoreSaveStatus("");
+        return;
+      }
       if (result?.ok) {
         setScoreSaveStatus(
           `Score saved (${result.streak ?? runStreak}). Check the leaderboard below.`
@@ -306,7 +312,7 @@
         finalStreakText.textContent = formatGameOverStreakLine();
         setActiveScreen(screenGameOver);
         window.scrollTo({ top: 0, behavior: "smooth" });
-        notifyRunFinished();
+        notifyRunFinished({ quiet: true });
       }, 1100);
     }
   }

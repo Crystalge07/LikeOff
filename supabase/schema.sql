@@ -2,14 +2,14 @@
 -- One file: table, RLS, RPCs, rate limit, profanity, server-owned timestamps.
 -- Note: SQL role "anon" is Supabase's public API role. In the app use the Publishable key.
 
--- Max streak = unique_posts / 2 (integer division). Current deck: 71 posts → 35.
+-- Max streak = unique_posts / 2 (integer division). Current deck: 85 posts → 42.
 -- Update this cap in SQL when posts.js grows (must match leaderboard.js maxAchievableStreak).
 
 create table if not exists public.score_runs (
   id uuid primary key default gen_random_uuid(),
   player_id uuid not null,
   display_name text not null check (char_length(display_name) between 1 and 24),
-  streak int not null check (streak >= 0 and streak <= 35),
+  streak int not null check (streak >= 0 and streak <= 42),
   finished_at timestamptz not null default now()
 );
 
@@ -19,7 +19,7 @@ alter table public.score_runs
 -- Tighten streak cap on existing projects (idempotent)
 alter table public.score_runs drop constraint if exists score_runs_streak_check;
 alter table public.score_runs
-  add constraint score_runs_streak_check check (streak >= 0 and streak <= 35);
+  add constraint score_runs_streak_check check (streak >= 0 and streak <= 42);
 
 create index if not exists score_runs_streak_idx on public.score_runs (streak desc);
 create index if not exists score_runs_finished_at_idx on public.score_runs (finished_at desc);
@@ -37,7 +37,7 @@ create policy "score_runs_insert"
   to anon, authenticated
   with check (
     streak >= 0
-    and streak <= 35
+    and streak <= 42
     and char_length(trim(display_name)) between 1 and 24
   );
 
