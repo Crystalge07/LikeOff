@@ -24,6 +24,13 @@
   const finalStreakText = $("finalStreakText");
   const winText = $("winText");
   const streakValue = $("streakValue");
+  const scoreSaveStatusEls = document.querySelectorAll(".score-save-status");
+  const endActionButtons = [
+    btnPlayAgain,
+    btnBackToMenu,
+    btnWinPlayAgain,
+    btnWinBackToMenu,
+  ];
 
   const POSTS = Array.isArray(window.POSTS) ? window.POSTS : [];
   const BEST_STREAK_KEY = "likeoff.bestStreak";
@@ -73,16 +80,55 @@
       clearTimeout(revealTimer);
       revealTimer = null;
     }
+    setScoreSaveStatus("");
+    setEndActionsDisabled(false);
     acceptingInput = false;
     setActiveScreen(screenStart);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function setScoreSaveStatus(message) {
+    for (const el of scoreSaveStatusEls) {
+      el.textContent = message;
+    }
+  }
+
+  function setEndActionsDisabled(disabled) {
+    for (const btn of endActionButtons) {
+      if (btn) btn.disabled = disabled;
+    }
+  }
+
+  function formatGameOverStreakLine() {
+    return `This run: ${streak} · Personal best: ${bestStreak}`;
+  }
+
   function notifyRunFinished() {
     const runStreak = streak;
-    if (window.LikeOffLeaderboard?.onRunFinished) {
-      void window.LikeOffLeaderboard.onRunFinished(runStreak);
+    const submit = window.LikeOffLeaderboard?.onRunFinished?.(runStreak);
+
+    if (!submit) {
+      setScoreSaveStatus("");
+      return;
     }
+
+    setScoreSaveStatus("Saving score to leaderboard…");
+    setEndActionsDisabled(true);
+
+    void submit.then((result) => {
+      setEndActionsDisabled(false);
+      if (result?.ok) {
+        setScoreSaveStatus(
+          `Score saved (${result.streak ?? runStreak}). Check the leaderboard below.`
+        );
+        return;
+      }
+      if (result?.message) {
+        setScoreSaveStatus(`Couldn’t save your score: ${result.message}`);
+        return;
+      }
+      setScoreSaveStatus("Couldn’t save your score. Try another run.");
+    });
   }
 
   function setStreakDisplay() {
@@ -180,6 +226,8 @@
       revealTimer = null;
     }
 
+    setScoreSaveStatus("");
+    setEndActionsDisabled(false);
     streak = 0;
     setStreakDisplay();
     remainingIndices = buildShuffledSessionDeck();
@@ -255,7 +303,7 @@
       hint.textContent = "Wrong. Game over…";
       revealTimer = setTimeout(() => {
         revealTimer = null;
-        finalStreakText.textContent = `Your longest streak: ${bestStreak}`;
+        finalStreakText.textContent = formatGameOverStreakLine();
         setActiveScreen(screenGameOver);
         window.scrollTo({ top: 0, behavior: "smooth" });
         notifyRunFinished();
@@ -318,7 +366,7 @@
   // Initial screen
   bestStreak = loadBestStreak();
   if (finalStreakText) {
-    finalStreakText.textContent = `Your longest streak: ${bestStreak}`;
+    finalStreakText.textContent = `Personal best: ${bestStreak}`;
   }
   setActiveScreen(screenStart);
   applyRoundedFavicon();

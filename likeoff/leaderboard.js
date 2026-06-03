@@ -69,6 +69,20 @@
     );
   }
 
+  function isRateLimitError(error) {
+    return (
+      error?.code === "P0001" &&
+      /rate limit|too many score submissions/i.test(String(error.message || ""))
+    );
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /** Serialize inserts so a fast "Play again" can't rate-limit out a higher score. */
+  let submitChain = Promise.resolve();
+
   function getOrCreatePlayerId() {
     try {
       let id = localStorage.getItem(PLAYER_ID_KEY);
@@ -233,17 +247,21 @@
   }
 
   async function submitRun({ playerId, displayName, streak }, allowProfanityRetry = true) {
-    if (!isConfigured()) return;
+    if (!isConfigured()) {
+      return { ok: false, message: "Leaderboard not configured." };
+    }
     const cap = maxAchievableStreak();
     const safeStreak = Math.min(Math.max(0, Math.floor(streak)), cap);
 
-    const { error } = await supabase.from("score_runs").insert({
-      player_id: playerId,
-      display_name: displayName,
-      streak: safeStreak,
-    });
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const { error } = await supabase.from("score_runs").insert({
+        player_id: playerId,
+        display_name: displayName,
+        streak: safeStreak,
+      });
 
-    if (error) {
+      if (!error) return { ok: true, streak: safeStreak };
+
       if (isProfanityInsertError(error) && allowProfanityRetry) {
         console.warn("Score submit failed:", error.message);
         clearDisplayName();
@@ -252,22 +270,42 @@
             "That name isn’t allowed on the leaderboard. Please choose another.";
         }
         const newName = await ensureDisplayName();
-        if (!newName) return;
+        if (!newName) return { ok: false, message: "Name required to save score." };
         return submitRun({ playerId, displayName: newName, streak }, false);
       }
+
+      if (isRateLimitError(error) && attempt < 4) {
+        await sleep(2500);
+        continue;
+      }
+
       console.warn("Score submit failed:", error.message);
+      return { ok: false, message: error.message || "Could not save score." };
     }
+
+    return { ok: false, message: "Could not save score. Try again in a few seconds." };
   }
 
-  async function onRunFinished(runStreak) {
-    if (!isConfigured()) return;
+  async function processRunFinished(runStreak) {
+    if (!isConfigured()) {
+      return { ok: false, message: "Leaderboard not configured." };
+    }
 
     const playerId = getOrCreatePlayerId();
     const displayName = await ensureDisplayName();
-    if (!displayName) return;
+    if (!displayName) {
+      return { ok: false, message: "Name required to save score." };
+    }
 
-    await submitRun({ playerId, displayName, streak: runStreak });
-    await refreshAll();
+    const result = await submitRun({ playerId, displayName, streak: runStreak });
+    if (result.ok) await refreshAll();
+    return result;
+  }
+
+  function onRunFinished(runStreak) {
+    const task = submitChain.then(() => processRunFinished(runStreak));
+    submitChain = task.catch(() => {});
+    return task;
   }
 
   function wireUi() {

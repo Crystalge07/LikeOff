@@ -579,9 +579,20 @@ h1 span { color: var(--linkedin-blue); }
 }
 
 .game-end__streak {
-  margin: 0 0 24px;
+  margin: 0 0 8px;
   font-size: 18px;
   color: #666;
+}
+
+.game-end__save {
+  margin: 0 0 24px;
+  min-height: 1.2em;
+  font-size: 14px;
+  color: #666;
+}
+
+.game-end__save:empty {
+  display: none;
 }
 
 .game-end__actions {
